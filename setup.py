@@ -1,18 +1,31 @@
 #!/usr/bin/env python
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
-    name="bunny1",
-    version="1.1",
-    description="bunny1 is a tool that lets you write smart bookmarks in " +
-        "python and then share them across all your browsers and with a " +
-        "group of people or the whole world.",
-    author="facebook",
-    author_email="bunny1-feedback@lists.facebook.com",
-    url="http://www.bunny1.org/",
-    packages=["bunny1"],
-    package_dir={"bunny1": "src"},
-    package_data={"bunny1": ["README", "LICENSE", "*.gif", "*.ico"]},
-    scripts=["src/b1_example.py", "src/b1_barebones.py"],
-    install_requires=["cherrypy>=3.1.0"],
+    name="cony",
+    version="0.1.0",
+    description=(
+        '"Cony" is a tool to write smart bookmarks in '
+        'python and to share them across all your browsers and with a '
+        'group of people or the whole world. This project inspired '
+        'by Facebook\'s bunny1.'
+    ),
+    keywords='bottle webapp smart bookmark browser',
+    license = 'New BSD License',
+    author="Alexander Artemenko",
+    author_email='svetlyak.40wt@gmail.com',
+    url='http://dev.svetlyak.ru/cony/',
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: WSGI :: Server',
+    ],
+    packages=find_packages(),
+    scripts=['cony.py'],
+    install_requires = ['bottle'],
 )
