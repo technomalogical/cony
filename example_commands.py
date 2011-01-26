@@ -18,3 +18,6 @@ def cmd_tr(term):
     else:
         direction = 'en|ru'
     redirect('http://translate.google.com/#%s|%s' % (direction, term))
+
+def cmd_pep(term):
+    redirect('http://www.python.org/dev/peps/pep-%0.4d/' % int(term))
