@@ -8,11 +8,11 @@ on the GitHub. This project is inspired by Facebook's [bunny1][].
 What the difference between Cony and Bunny1?
 --------------------------------------------
 
-* Cony have no other dependencies other than Bottle, which itself is a
+* Cony has no other dependencies other than Bottle, which itself is a
   micro web framework without dependencies.
-* Cony can be easily extended. I have no to inherit any classes like
+* Cony could be easily extended. You have no need to inherit any classes like
   you do with Bunny1. With Cony, you place you commands in a separate
-  file and run a programm.
+  file and fire `./cony.py`.
 
 Introduction
 ------------
