@@ -5,6 +5,18 @@ Shared Smart Bookmarks Server
 to share them across all your browsers and with other developers
 on the GitHub. This project is inspired by Facebook's [bunny1][].
 
+What the difference between Cony and Bunny1?
+--------------------------------------------
+
+* Cony have no other dependencies other than Bottle, which itself is a
+  micro web framework without dependencies.
+* Cony can be easily extended. I have no to inherit any classes like
+  you do with Bunny1. With Cony, you place you commands in a separate
+  file and run a programm.
+
+Introduction
+------------
+
 Smart bookmarks is a fast way to retrive information from the web.
 For example, you could write a `w smart bookmarks` in the browser's
 location bar and it will open a Wikipedia article about [smart bookmarks][smart-bm].
