@@ -60,6 +60,12 @@ and `http://localhost:8080/?s=%s`. Hit `OK` and then select `Cony` from the list
 of search engines and hit the `Make Default` button to make it your default search
 engine. Now, type `pypi cony` into your location bar and hit enter.
 
+### Safari
+
+For Safari you could try to install [Keywurl][] plugin. And add a `Cony` as default
+search.
+
 
 [smart-bm]: http://en.wikipedia.org/wiki/Smart_bookmark
 [bunny1]: https://github.com/facebook/bunny1
+[Keywurl]: http://alexstaubo.github.com/keywurl/
