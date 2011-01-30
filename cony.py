@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from bottle import route, run, debug, request, redirect
+from bottle import SimpleTemplate, template
 
 DEBUG = True
 
@@ -36,20 +37,92 @@ def cmd_p(term):
 
 cmd_fallback = cmd_g
 
+# Templates related part
+
+_TEMPLATES = dict( # {{{
+    layout = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title or u'Cony — Smart bookmarks' }}</title>
+        <style>
+        .container {
+            margin: 2em 200px 2em 200px; background: #EEE;
+            padding: 1em 1em 0.5em 1em;
+        }
+        .container header {
+            border-bottom: 1px solid #BBB;
+            margin-bottom: 2em;
+        }
+        .container dl.help dd {
+            margin-bottom: 1em;
+        }
+        .container dl.help dt {
+            font-weight: bold;
+        }
+        .container footer {
+            border-top: 1px solid #BBB;
+            text-align: center;
+        }
+        .container footer p {
+            font-size: 0.75em;
+            margin-top: 0.5em;
+            margin-bottom: 0.2em;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header><h1>{{ title }}</h1></header>
+            %include
+            <footer>
+                <p class="copyright">Opensource. By <a href="mailto:svetlyak.40wt@gmail.com">Alexander Artemenko</a>. <a href="http://github.com/svetlyak40wt/cony/">Fork it</a> at the GitHub.</p>
+                <p class="thanks">Idea was stolen from Facebook's <a href="https://github.com/facebook/bunny1/">bunny1</a>, thanks them a lot.</p>
+            </footer>
+        </div>
+    </body>
+</html>
+""",
+    help = """
+    <dl class="help">
+    %for item in items:
+        <dt>{{ item[0] }}</dt>
+        <dd>{{ item[1] }}</dt>
+    %end
+    </dl>
+%rebase layout title='Help — Cony'
+"""
+) # }}}
+
+
+class VerySimpleTemplate(SimpleTemplate):
+    """ A wrapper around Bottle templates, allows to
+        define templates right in the same file keeping
+        ability to use inheritance.
+    """
+    def __init__(self, source=None, name=None, **kwargs):
+        if source is None and name is not None:
+            source = _TEMPLATES[name]
+        super(VerySimpleTemplate, self).__init__(
+            source=source, name=name, **kwargs
+        )
+
 
 try:
     from local_commands import *
+    if 'TEMPLATES' in locals():
+        _TEMPLATES.update(TEMPLATES)
 except ImportError:
     pass
 
 
 def cmd_help(term):
     """Shows all available commands."""
-    commands = []
+    items = []
     for name, obj in sorted(globals().items()):
         if name.startswith('cmd_') and callable(obj):
-            commands.append('%s — %s' % (name[4:], obj.__doc__))
-    return '<br/>'.join(commands)
+            items.append((name[4:], obj.__doc__))
+    return dict(items = items, title = u'Help — Cony')
 
 
 @route('/')
@@ -66,7 +139,18 @@ def do_command():
     if command is cmd_fallback:
         term = search_string
 
-    return command(term)
+    result = command(term)
+    if isinstance(result, dict):
+        # Command could return a dict
+        # in that case, we have to render it first
+        name = result.pop('template', command_name)
+        kwargs = dict(
+            title = None,
+        )
+        kwargs.update(result)
+        return template(name, template_adapter=VerySimpleTemplate, **kwargs)
+    else:
+        return result
 
 
 if __name__ == '__main__':
