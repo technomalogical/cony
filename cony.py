@@ -120,8 +120,11 @@ def cmd_help(term):
     """Shows all available commands."""
     items = []
     for name, obj in sorted(globals().items()):
-        if name.startswith('cmd_') and callable(obj):
-            items.append((name[4:], obj.__doc__))
+        if name != 'cmd_fallback' and name.startswith('cmd_') and callable(obj):
+            if obj is cmd_fallback:
+                items.append((name[4:] + ' (default)', obj.__doc__))
+            else:
+                items.append((name[4:], obj.__doc__))
     return dict(items = items, title = u'Help — Cony')
 
 
