@@ -34,7 +34,6 @@ def cmd_wo(term):
     This command requires `simplejson` module to be installed.
     """
     import simplejson
-    variants = []
 
     template = """
     <ul>
@@ -45,6 +44,7 @@ def cmd_wo(term):
     %rebase layout title='Word translation'
     """
 
+    variants = {}
 
     for i in reversed(range((len(term) + 1) / 2, len(term) + 1)):
         url = 'http://suggest-slovari.yandex.ru/suggest-lingvo?v=2&lang=en&part=%s' % term[:i]
@@ -53,9 +53,9 @@ def cmd_wo(term):
         if data[0]:
             for trans, link in zip(*data[1:]):
                 en, ru = trans.split(' - ', 1)
-                variants.append(dict(en=en, ru=ru, link=link))
+                variants[en] = dict(en=en, ru=ru, link=link)
             if len(variants) > 5:
                 break
 
-    return dict(template=template, variants=variants)
+    return dict(template=template, variants=sorted(variants.values()))
 
