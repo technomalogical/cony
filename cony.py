@@ -14,16 +14,12 @@ from itertools import groupby
 #  These values can be overridden in a "local_settings.py" file so that
 #  your local changes don't require merging into new versions of cony.
 ################
-DEBUG = True
 
-################################################
-#  Uncomment only one of these SERVER_* sections
-################################################
+DEBUG = True
 #  Stand-alone server running as a daemon on port 8080
 SERVER_MODE = 'STANDALONE' # or 'WSGI', or 'CGI'
 SERVER_PORT = 8080
-SERVER_HOST = 'localhost'
-#SERVER_HOST = ''    #  to allow on all interfaces
+SERVER_HOST = 'localhost'  # or '' to allow on all interfaces
 
 
 ##################
@@ -33,6 +29,8 @@ SERVER_HOST = 'localhost'
 def cmd_g(term):
     """Google search."""
     redirect('http://www.google.com/search?q=%s' % term)
+
+cmd_fallback = cmd_g
 
 
 def cmd_pypi(term):
@@ -58,9 +56,38 @@ def cmd_p(term):
     redirect('http://docs.python.org/search.html?q=%s&check_keywords=yes&area=default' % term)
 
 
-cmd_fallback = cmd_g
+def cmd_help(term):
+    """Shows all available commands."""
+    items = []
 
+    functions = sorted(globals().items())
+
+    commands = (
+        (cmd, name)
+        for name, cmd in functions
+        if name != 'cmd_fallback' and name.startswith('cmd_') and callable(cmd)
+    )
+
+    commands = groupby(commands, lambda x: x[0])
+
+    # "list" of (func, (cmd_example, cmd_exmpl, cmd_ex, ...)) tuples
+    # names are sorted by length
+    commands = (
+        (cmd, sorted(map(lambda x: x[1][4:], values), key=lambda x: len(x), reverse=True))
+        for cmd, values in commands
+    )
+
+    for cmd, names in commands:
+        names = ', '.join(names)
+        if cmd is cmd_fallback:
+            names += ' (default)'
+        items.append((names, cmd.__doc__))
+
+    return dict(items = items, title = u'Help — Cony')
+
+########################
 # Templates related part
+########################
 
 _TEMPLATES = dict( # {{{
     layout = """
@@ -137,36 +164,6 @@ try:
         _TEMPLATES.update(TEMPLATES)
 except ImportError:
     pass
-
-
-def cmd_help(term):
-    """Shows all available commands."""
-    items = []
-
-    functions = sorted(globals().items())
-
-    commands = (
-        (cmd, name)
-        for name, cmd in functions
-        if name != 'cmd_fallback' and name.startswith('cmd_') and callable(cmd)
-    )
-
-    commands = groupby(commands, lambda x: x[0])
-
-    # "list" of (func, (cmd_example, cmd_exmpl, cmd_ex, ...)) tuples
-    # names are sorted by length
-    commands = (
-        (cmd, sorted(map(lambda x: x[1][4:], values), key=lambda x: len(x), reverse=True))
-        for cmd, values in commands
-    )
-
-    for cmd, names in commands:
-        names = ', '.join(names)
-        if cmd is cmd_fallback:
-            names += ' (default)'
-        items.append((names, cmd.__doc__))
-
-    return dict(items = items, title = u'Help — Cony')
 
 
 @route('/')

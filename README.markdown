@@ -143,6 +143,57 @@ location bar in Chrome.
 For Safari you could try to install [Keywurl][] plugin. And add a `Cony`
 as default search.
 
+Creating Custom Commands
+------------------------
+
+Cony defines some default commands ("g", "p", and "pypi", as well as a
+general "help" command).  However, you can also create your own commands
+by placing them in a `local_settings.py`.
+
+If you define a `cmd_fallback` function (which is probably just set to
+another function, like `cmd_fallback = cmd_g`), then this will be used if
+no other command is matched. If you do not define a "cmd_fallback", then
+the default "cmd_g" is used, doing a Google search. Similarly, if no
+`cmd_help` is defined, a default one will be used which shows the
+[docstrings][] of the commands.
+
+Default Cony's commands could be overridden or turned off. Too turn command
+off, just assign it none in your `local_settings.py`: `cmd_g = None`.
+
+Also, commands could be aliased: `cmd_tl = cmd_too_long`.
+
+For example, here is a simple `local_settings.py` config that uses the default
+"g", "p", but not "pypi" commands, uses the default fallback and help commands
+(as described above), and creates a "weather" command with an alias "w":
+
+   from bottle import redirect
+
+   #  local templates
+   TEMPLATES = dict(
+      weather = """
+         <p />Display the weather in the specified location.  For example,
+         you could enter the following locations:
+         <dl class="help">
+         %for example in examples:
+         <dt><a href="/?s=weather {{ example }}">{{ example }}</a></dt>
+         %end
+         </dl>
+         %rebase layout title = 'Weather Help'
+         """,
+      )
+
+   def cmd_weather(term):
+      '''Look up weather forecast in the specified location.'''
+      examples = [ 'Moscow, Russia', 'Fort Collins, Colorado' ]
+      if term and term != 'help':
+         redirect('http://weather.yahoo.com/search/weather?location=%s' % term)
+      else:
+         #  render the "weather" template defined above, pass "examples"
+         return dict(examples = examples)
+
+   cmd_w = cmd_weather
+   cmd_pypi = None
+
 
 Contributors
 ------------
@@ -153,3 +204,4 @@ Contributors
 [smart-bm]: http://en.wikipedia.org/wiki/Smart_bookmark
 [bunny1]: https://github.com/facebook/bunny1
 [Keywurl]: http://alexstaubo.github.com/keywurl/
+[docstrings]: http://en.wikipedia.org/wiki/Docstring#Python
