@@ -184,7 +184,11 @@ def do_command():
     if isinstance(result, dict):
         # Command could return a dict
         # in that case, we have to render it first
-        name = result.pop('template', command_name)
+
+        # here we have to take original function's name
+        # to work with aliases
+        original_cmd_name = command.__name__[4:]
+        name = result.pop('template', original_cmd_name)
         kwargs = dict(
             title = None,
         )
