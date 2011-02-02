@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from itertools import groupby
 from bottle import route, run, debug, request, redirect
 from bottle import SimpleTemplate, template
 
@@ -119,12 +120,30 @@ except ImportError:
 def cmd_help(term):
     """Shows all available commands."""
     items = []
-    for name, obj in sorted(globals().items()):
-        if name != 'cmd_fallback' and name.startswith('cmd_') and callable(obj):
-            if obj is cmd_fallback:
-                items.append((name[4:] + ' (default)', obj.__doc__))
-            else:
-                items.append((name[4:], obj.__doc__))
+
+    functions = sorted(globals().items())
+
+    commands = (
+        (cmd, name)
+        for name, cmd in functions
+        if name != 'cmd_fallback' and name.startswith('cmd_') and callable(cmd)
+    )
+
+    commands = groupby(commands, lambda x: x[0])
+
+    # "list" of (func, (cmd_example, cmd_exmpl, cmd_ex, ...)) tuples
+    # names are sorted by length
+    commands = (
+        (cmd, sorted(map(lambda x: x[1][4:], values), key=lambda x: len(x), reverse=True))
+        for cmd, values in commands
+    )
+
+    for cmd, names in commands:
+        names = ', '.join(names)
+        if cmd is cmd_fallback:
+            names += ' (default)'
+        items.append((names, cmd.__doc__))
+
     return dict(items = items, title = u'Help — Cony')
 
 
