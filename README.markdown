@@ -58,6 +58,45 @@ Ways to install Cony:
 Now you have server up and running. It binds to the localhost:8080 by
 default. Open the <http://localhost:8080> in your browser to see the help.
 
+You can configure Cony by editing the top of "cony.py" and looking for the
+"SERVER_*" entries.  These can be adjusted to change the port, change what
+interface is bound to (use '' to bind to all interfaces).
+
+You can also configure CGI or WSGI modes if you want to integrate this into
+an existing web server such as Apache.
+
+### Apache CGI
+
+Create "local_settings.py" which contains:
+
+    SERVER_MODE = 'CGI'
+
+In your Apache configuration, add:
+
+    ScriptAlias /cony/ /path/to/cony.py
+
+Re-start Apache and you should now be able to use
+"http://servername/cony/?s=%s" as the Cony URL in your browser
+configuration.
+
+### Apache WSGI
+
+Create "local_settings.py" which contains:
+
+    SERVER_MODE = 'WSGI'
+
+Install mod_wsgi ("apt-get install libapache2-mod-wsgi" or "yum install
+mod_wsgi").
+
+In your Apache configuration, add:
+
+    WSGIPythonPath /path/to/cony/directory
+    WSGIScriptAlias /cony/ /path/to/cony/directory/cony.py
+
+Re-start Apache and you should now be able to use
+"http://servername/cony/?s=%s" as the Cony URL in your browser
+configuration.
+
 Browser Configuration
 ---------------------
 
@@ -104,6 +143,12 @@ location bar in Chrome.
 For Safari you could try to install [Keywurl][] plugin. And add a `Cony`
 as default search.
 
+
+Contributors
+------------
+
+* Alexander Artemenko (author)
+* Sean Reifschneider
 
 [smart-bm]: http://en.wikipedia.org/wiki/Smart_bookmark
 [bunny1]: https://github.com/facebook/bunny1

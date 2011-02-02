@@ -1,12 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from itertools import groupby
-from bottle import route, run, debug, request, redirect
-from bottle import SimpleTemplate, template
+import sys
+import bottle
 
+from bottle import SimpleTemplate, template
+from bottle import route, run, request, redirect
+from itertools import groupby
+
+################
+#  CONFIGURATION
+#
+#  These values can be overridden in a "local_settings.py" file so that
+#  your local changes don't require merging into new versions of cony.
+################
 DEBUG = True
 
+################################################
+#  Uncomment only one of these SERVER_* sections
+################################################
+#  Stand-alone server running as a daemon on port 8080
+SERVER_MODE = 'STANDALONE' # or 'WSGI', or 'CGI'
+SERVER_PORT = 8080
+SERVER_HOST = 'localhost'
+#SERVER_HOST = ''    #  to allow on all interfaces
+
+
+##################
+# Default commands
+##################
 
 def cmd_g(term):
     """Google search."""
@@ -110,7 +132,7 @@ class VerySimpleTemplate(SimpleTemplate):
 
 
 try:
-    from local_commands import *
+    from local_settings import *
     if 'TEMPLATES' in locals():
         _TEMPLATES.update(TEMPLATES)
 except ImportError:
@@ -175,7 +197,21 @@ def do_command():
         return result
 
 
-if __name__ == '__main__':
-    debug(DEBUG)
-    run(reloader = DEBUG)
+bottle.debug(DEBUG)
 
+if SERVER_MODE == 'WSGI':
+    application = bottle.app()
+
+elif __name__ == '__main__':
+    if SERVER_MODE == 'STANDALONE':
+        run(
+            reloader=DEBUG,
+            host=SERVER_HOST,
+            port=SERVER_PORT,
+        )
+    elif SERVER_MODE == 'CGI':
+        run(server=bottle.CGIServer)
+    else:
+        print 'Wrong SERVER_MODE=%r defined for running from command-line' % (SERVER_MODE,)
+        sys.exit(1)
+    sys.exit(0)
