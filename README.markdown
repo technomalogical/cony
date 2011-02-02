@@ -166,33 +166,33 @@ For example, here is a simple `local_settings.py` config that uses the default
 "g", "p", but not "pypi" commands, uses the default fallback and help commands
 (as described above), and creates a "weather" command with an alias "w":
 
-   from bottle import redirect
+    from bottle import redirect
 
-   #  local templates
-   TEMPLATES = dict(
-      weather = """
-         <p />Display the weather in the specified location.  For example,
-         you could enter the following locations:
-         <dl class="help">
-         %for example in examples:
-         <dt><a href="/?s=weather {{ example }}">{{ example }}</a></dt>
-         %end
-         </dl>
-         %rebase layout title = 'Weather Help'
-         """,
-      )
+    #  local templates
+    TEMPLATES = dict(
+       weather = """
+          <p />Display the weather in the specified location.  For example,
+          you could enter the following locations:
+          <dl class="help">
+          %for example in examples:
+          <dt><a href="/?s=weather {{ example }}">{{ example }}</a></dt>
+          %end
+          </dl>
+          %rebase layout title = 'Weather Help'
+          """,
+       )
 
-   def cmd_weather(term):
-      '''Look up weather forecast in the specified location.'''
-      examples = [ 'Moscow, Russia', 'Fort Collins, Colorado' ]
-      if term and term != 'help':
-         redirect('http://weather.yahoo.com/search/weather?location=%s' % term)
-      else:
-         #  render the "weather" template defined above, pass "examples"
-         return dict(examples = examples)
+    def cmd_weather(term):
+       '''Look up weather forecast in the specified location.'''
+       examples = [ 'Moscow, Russia', 'Fort Collins, Colorado' ]
+       if term and term != 'help':
+          redirect('http://weather.yahoo.com/search/weather?location=%s' % term)
+       else:
+          #  render the "weather" template defined above, pass "examples"
+          return dict(examples = examples)
 
-   cmd_w = cmd_weather
-   cmd_pypi = None
+    cmd_w = cmd_weather
+    cmd_pypi = None
 
 
 Contributors
