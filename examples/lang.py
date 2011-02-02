@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import datetime
 import os.path
 import urllib
+
 from bottle import redirect
 
 def cmd_tr(term):
@@ -12,18 +14,25 @@ def cmd_tr(term):
     redirect('http://translate.google.com/#%s|%s' % (direction, term))
 
 def cmd_save_word(term):
-    """Saves word and it's translation into the ~/.words
+    """Saves word and it's translation into the  ~/.words/YYYY-MM-DD.txt
 
-    This file could be used to import words into
-    the FlashCards ToGo.
+    These files could be used to import words into the FlashCards ToGo.
     """
+
+    filename = datetime.datetime.now().strftime('~/.words/%Y-%m-%d.txt')
 
     template = """
-    <p>Translation "{{ word }}" was saved to ~/.words</p>
-    %rebase layout title='Translation saved'
-    """
+    <p>Translation "{{ word }}" was saved to %s</p>
+    %%rebase layout title='Translation saved'
+    """ % filename
 
-    with open(os.path.expanduser('~/.words'), 'a+') as f:
+    filename = os.path.expanduser(filename)
+    dirname = os.path.dirname(filename)
+
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+
+    with open(filename, 'a+') as f:
         f.write(term)
         f.write('\n')
     return dict(template=template, word=term)
