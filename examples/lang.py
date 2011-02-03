@@ -5,7 +5,7 @@ import urllib
 
 from bottle import redirect
 
-def cmd_tr(term):
+def cmd_translate(term):
     """Translates the text using Google Translate."""
     if len(term.decode('utf-8')) < len(term):
         direction = 'ru|en'
@@ -13,11 +13,16 @@ def cmd_tr(term):
         direction = 'en|ru'
     redirect('http://translate.google.com/#%s|%s' % (direction, term))
 
+cmd_tr = cmd_translate
+
+
 def cmd_save_word(term):
     """Saves word and it's translation into the  ~/.words/YYYY-MM-DD.txt
 
     These files could be used to import words into the FlashCards ToGo.
     """
+    if ';' not in term:
+        return cmd_search_word(term)
 
     filename = datetime.datetime.now().strftime('~/.words/%Y-%m-%d.txt')
 
@@ -37,7 +42,8 @@ def cmd_save_word(term):
         f.write('\n')
     return dict(template=template, word=term)
 
-def cmd_wo(term):
+
+def cmd_search_word(term):
     """Searches word translations at the http://slovari.yandex.ru.
 
     This command requires `simplejson` module to be installed.
@@ -68,3 +74,4 @@ def cmd_wo(term):
 
     return dict(template=template, variants=sorted(variants.values()))
 
+cmd_wo = cmd_search_word
