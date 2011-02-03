@@ -60,7 +60,9 @@ def cmd_help(term):
     """Shows all available commands."""
     items = []
 
-    functions = sorted(globals().items())
+    # functions should be sorted by value
+    # because we will group them lately
+    functions = sorted(globals().items(), key=lambda x: x[1])
 
     commands = (
         (cmd, name)
@@ -76,6 +78,9 @@ def cmd_help(term):
         (cmd, sorted(map(lambda x: x[1][4:], values), key=lambda x: len(x), reverse=True))
         for cmd, values in commands
     )
+
+    # and finally, sort by name
+    commands = sorted(commands, key=lambda x: x[1])
 
     for cmd, names in commands:
         names = ', '.join(names)
